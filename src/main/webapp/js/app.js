@@ -97,7 +97,7 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         });
     };
     $scope.remove_directory = function(destination, index) {
-        $scope.config.sourceDirectories.splice(index,1);
+        $scope.config[destination].splice(index,1);
     };
     $scope.contents = function(fullPath) {
         return $http.get('/rest/xform/file/' + $scope.config.uuid + '/contents', {params: {uuid: $scope.config.uuid, fullPath: fullPath}}).success(function(data) {
