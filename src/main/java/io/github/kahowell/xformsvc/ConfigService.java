@@ -41,7 +41,7 @@ public class ConfigService {
     private static Config[] builtin = new Config[]{};
     static {
         try {
-            File configFile = new File("config.json");
+            File configFile = new File(System.getenv("HOME") + "/.xformliveconfig.json"); // FIXME - fix for non-unix
             log.info("Reading config from " + configFile.getAbsolutePath());
 
             ObjectMapper mapper = new ObjectMapper();
