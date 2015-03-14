@@ -36,7 +36,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>xform-service</finalName>
+    <finalName>xform-live</finalName>
     <plugins>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -57,6 +57,30 @@
           </httpConnector>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.1.1</version>
+            <configuration>
+              <outputDirectory>webapps</outputDirectory>
+              <warName>ROOT</warName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
