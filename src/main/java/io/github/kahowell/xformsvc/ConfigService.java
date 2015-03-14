@@ -20,6 +20,9 @@ package io.github.kahowell.xformsvc;
 
 import io.github.kahowell.xformsvc.model.Config;
 
+import java.io.File;
+import java.util.logging.Logger;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -29,8 +32,30 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 @Path("/config")
 public class ConfigService {
+    private static Logger log = Logger.getLogger(ConfigService.class.getCanonicalName());
+
+    private static Config[] builtin = new Config[]{};
+    static {
+        try {
+            File configFile = new File("config.json");
+            log.info("Reading config from " + configFile.getAbsolutePath());
+
+            ObjectMapper mapper = new ObjectMapper();
+            builtin = mapper.readValue(configFile, Config[].class);
+
+            for (Config config : builtin) {
+                Config.replaceConfig(config);
+            }
+        }
+        catch (Exception e) {
+            log.warning(e.getMessage());
+            log.info("Error reading config.json; app will operate in configurable mode");
+        }
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,5 +82,12 @@ public class ConfigService {
     @Path("{uuid}")
     public void setConfig(@PathParam("uuid") String uuid, Config config) {
         Config.replaceConfig(config);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("builtin")
+    public Config[] getBuiltin() {
+        return builtin;
     }
 }

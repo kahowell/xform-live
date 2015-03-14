@@ -27,6 +27,8 @@ xform_live.factory('TransformationFile', ['$resource', function($resource) {
     return $resource('rest/xform/file/:uuid/transformation_files', {fullPath:'@fullPath'});
 }]);
 xform_live.controller('dummy_controller', function($scope, $http, $interval, $location, Config, SourceFile, TransformationFile) {
+    $scope.config_list = [];
+    $scope.selected_builtin;
     $scope.selected = {};
     $scope.source_contents = {};
     $scope.transformed = {};
@@ -68,13 +70,16 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         return '/rest/xform/config/' + $scope.config.uuid + '/download';
     };
     $scope.refresh = function() {
+        $http.get('/rest/xform/config/builtin').success(function(data) {
+            $scope.config_list = data;
+        });;
         function refresh_after_config() {
+            $location.hash($scope.config.uuid);
             $scope.source_files = SourceFile.query({uuid: $scope.config.uuid});
             $scope.transformations = TransformationFile.query({uuid: $scope.config.uuid});
             for (var path in $scope.selected) {
                 $scope.refresh_views(path, true);
             }
-            $location.hash($scope.config.uuid);
         }
         if ($scope.config) {
             refresh_after_config();
@@ -174,4 +179,8 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
             }
         }, 1000);
     };
+    $scope.load_builtin = function() {
+        $scope.config = JSON.parse($scope.selected_builtin);
+        $scope.refresh();
+    }
 });

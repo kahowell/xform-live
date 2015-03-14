@@ -64,7 +64,7 @@
                 </div>
                 <div class="collapse navbar-collapse" id="navbar-top">
                     <div class="form-inline">
-                        <div class="btn-group">
+                        <div class="btn-group" ng-show="config_list.length == 0">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle navbar-btn" id="config-dropdown" data-toggle="dropdown">
                                     <span class="glyphicon glyphicon-edit"></span>
@@ -90,6 +90,12 @@
                                     </a></li>
                                 </ul>
                             </div>
+                        </div>
+                        <div class="btn-group" ng-show="config_list.length > 0">
+                            <label for="config-dropdown">Configuration</label>
+                            <select class="form-control" id="config_dropdown" ng-model="selected_builtin" ng-change="load_builtin()">
+                                <option value="{{config}}" ng-repeat="config in config_list">{{config.uuid}}</option>
+                            </select>
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-default navbar-btn" id="force-refresh" ng-click="refresh()">
