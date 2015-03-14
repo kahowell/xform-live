@@ -41,7 +41,11 @@ public class ConfigService {
     private static Config[] builtin = new Config[]{};
     static {
         try {
-            File configFile = new File(System.getenv("HOME") + "/.xformliveconfig.json"); // FIXME - fix for non-unix
+            String dataPath = System.getenv("OPENSHIFT_DATA_DIR"); // TODO don't couple here; allow deployment on other platforms
+            if (dataPath == null) {
+                dataPath = System.getenv("HOME"); // FIXME - fix for non-unix
+            }
+            File configFile = new File(dataPath + "/.xformliveconfig.json");
             log.info("Reading config from " + configFile.getAbsolutePath());
 
             ObjectMapper mapper = new ObjectMapper();
