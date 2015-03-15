@@ -26,11 +26,12 @@ xform_live.factory('SourceFile', ['$resource', function($resource) {
 xform_live.factory('TransformationFile', ['$resource', function($resource) {
     return $resource('rest/xform/file/:uuid/transformation_files', {fullPath:'@fullPath'});
 }]);
-xform_live.controller('dummy_controller', function($scope, $http, $interval, $location, Config, SourceFile, TransformationFile) {
+xform_live.controller('dummy_controller', function($scope, $http, $interval, $location, $q, Config, SourceFile, TransformationFile) {
     $scope.config_list = [];
     $scope.selected_builtin;
     $scope.selected = {};
     $scope.source_contents = {};
+    $scope.pending_transforms = {};
     $scope.transformed = {};
     $scope.new_directory = {};
     $scope.selected_transformations = [];
@@ -127,7 +128,13 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         else {
             contents = $scope.transformed[$index - 1][fullPath].contents;
         }
-        $http.post('/rest/xform/transform/' + $scope.config.uuid, contents, {params: {transformation: $scope.selected_transformations[$index]}}).success(function(transformed) {
+        if ($index in $scope.pending_transforms) {
+            var request_cancel = $scope.pending_transforms[$index];
+            request_cancel.resolve();
+        }
+        var request_cancel = $q.defer();
+        $scope.pending_transforms[$index] = request_cancel;
+        $http.post('/rest/xform/transform/' + $scope.config.uuid, contents, {params: {transformation: $scope.selected_transformations[$index]}, timeout: request_cancel.promise}).success(function(transformed) {
             $scope.transformed[$index][fullPath] = {
                 transformation: $scope.selected_transformations[$index],
                 contents: transformed,
@@ -137,7 +144,8 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
             if ($index + 1 < $scope.selected_transformations.length) {
                 $scope.transform(fullPath, $index + 1);
             }
-        }).error(function(data) {
+            delete $scope.pending_transforms[$index];
+        }).error(function(data, status) {
             for (var i = $index; i < $scope.selected_transformations.length; i++) {
                 $scope.transformed[i][fullPath] = {
                     transformation: null,
@@ -147,7 +155,10 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
                 }
             }
             $scope.transformed[$index][fullPath].transformation = $scope.selected_transformations[$index];
-        });
+            if (status != 0) { // weren't aborted
+                delete $scope.pending_transforms[$index];
+            }
+        })
     };
     $scope.add_transformation = function() {
         $scope.selected_transformations.push(null);

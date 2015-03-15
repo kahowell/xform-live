@@ -155,14 +155,20 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-6" ng-repeat="selected_transformation in selected_transformations track by $index">
-                                <div class="panel" ng-class="{'panel-success': transformed[$index][file.fullPath].successful, 'panel-danger': !transformed[$index][file.fullPath].successful}">
+                                <div class="panel" ng-class="{'panel-success': transformed[$index][file.fullPath].successful, 'panel-danger': !transformed[$index][file.fullPath].successful && !(pending_transforms[$index]), 'panel-default': pending_transforms[$index]}">
                                     <div class="panel-heading">
                                         <h1 class="panel-title" ng-if="selected_transformation"><strong>After {{selected_transformation}}</strong></h1>
                                     </div>
-                                    <div ui-ace="{mode:'xml',onLoad:editor_init}" readonly="true" ng-model="transformed[$index][file.fullPath].contents" ng-if="transformed[$index][file.fullPath].successful"></div>
-                                    <div class="panel-body" ng-if="!transformed[$index][file.fullPath].successful">
+                                    <div class="panel-body" ng-if="!transformed[$index][file.fullPath].successful && !(pending_transforms[$index])">
                                         Error: No transformation selected or transformation failed.
                                     </div>
+                                    <div class="panel-body" ng-if="pending_transforms[$index]">
+                                        Please wait... transforming.
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-striped active" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                    <div ui-ace="{mode:'xml',onLoad:editor_init}" readonly="true" ng-model="transformed[$index][file.fullPath].contents" ng-if="transformed[$index][file.fullPath].successful && !(pending_transforms[$index])"></div>
                                 </div>
                             </div>
                         </div>
