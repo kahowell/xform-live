@@ -114,6 +114,7 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         });
     };
     $scope.transform = function(fullPath, $index) {
+        console.log('transforming', fullPath, 'with index', $index);
         if (typeof($index) === 'undefined') {
             $index = 0;
         }
@@ -128,12 +129,15 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         else {
             contents = $scope.transformed[$index - 1][fullPath].contents;
         }
-        if ($index in $scope.pending_transforms) {
-            var request_cancel = $scope.pending_transforms[$index];
+        if ($index in $scope.pending_transforms && fullPath in $scope.pending_transforms[$index]) {
+            var request_cancel = $scope.pending_transforms[$index][fullPath];
             request_cancel.resolve();
         }
         var request_cancel = $q.defer();
-        $scope.pending_transforms[$index] = request_cancel;
+        if (!($index in $scope.pending_transforms)) {
+            $scope.pending_transforms[$index] = {};
+        }
+        $scope.pending_transforms[$index][fullPath] = request_cancel;
         $http.post('/rest/xform/transform/' + $scope.config.uuid, contents, {params: {transformation: $scope.selected_transformations[$index]}, timeout: request_cancel.promise}).success(function(transformed) {
             $scope.transformed[$index][fullPath] = {
                 transformation: $scope.selected_transformations[$index],
@@ -169,8 +173,10 @@ xform_live.controller('dummy_controller', function($scope, $http, $interval, $lo
         $scope.selected_transformations.pop();
     }
     $scope.change_transform = function($index) {
+        console.log('changing transform index ', $index);
         for (path in $scope.source_contents) {
-            if ($scope.selected[path] && !($scope.transformed[$index][path]) || $scope.transformed[$index][path].transformation != $scope.selected_transformations[$index]) {
+            console.log('needle', path, 'haystack', $scope.selected);
+            if (path in $scope.selected) {
                 $scope.transform(path, $index);
             }
         }

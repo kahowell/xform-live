@@ -159,16 +159,16 @@
                                     <div class="panel-heading">
                                         <h1 class="panel-title" ng-if="selected_transformation"><strong>After {{selected_transformation}}</strong></h1>
                                     </div>
-                                    <div class="panel-body" ng-if="!transformed[$index][file.fullPath].successful && !(pending_transforms[$index])">
+                                    <div class="panel-body" ng-if="!transformed[$index][file.fullPath].successful && !(pending_transforms[$index][file.fullPath])">
                                         Error: No transformation selected or transformation failed.
                                     </div>
-                                    <div class="panel-body" ng-if="pending_transforms[$index]">
+                                    <div class="panel-body" ng-if="pending_transforms[$index][file.fullPath]">
                                         Please wait... transforming.
                                         <div class="progress">
                                             <div class="progress-bar progress-bar-striped active" style="width: 100%"></div>
                                         </div>
                                     </div>
-                                    <div ui-ace="{mode:'xml',onLoad:editor_init}" readonly="true" ng-model="transformed[$index][file.fullPath].contents" ng-if="transformed[$index][file.fullPath].successful && !(pending_transforms[$index])"></div>
+                                    <div ui-ace="{mode:'xml',onLoad:editor_init}" readonly="true" ng-model="transformed[$index][file.fullPath].contents" ng-if="transformed[$index][file.fullPath].successful && !(pending_transforms[$index][file.fullPath])"></div>
                                 </div>
                             </div>
                         </div>
