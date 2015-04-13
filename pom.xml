@@ -48,6 +48,22 @@
           </configuration>
       </plugin>
       <plugin>
+        <groupId>pl.allegro</groupId>
+        <artifactId>grunt-maven-plugin</artifactId>
+        <version>1.5.0</version>
+        <configuration>
+          <gruntBuildDirectory>target/grunt</gruntBuildDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>create-resources</goal>
+              <goal>bower</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
         <version>9.2.1.v20140609</version>
@@ -55,6 +71,12 @@
           <httpConnector>
             <host>localhost</host>
           </httpConnector>
+          <webAppConfig>
+            <resourceBases>
+              <resourceBase>src/main/webapp</resourceBase>
+              <resourceBase>${basedir}/target/grunt</resourceBase>
+            </resourceBases>
+          </webAppConfig>
         </configuration>
       </plugin>
       <plugin>
@@ -62,6 +84,11 @@
         <version>2.1.1</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <resource>
+              <directory>${basedir}/target/grunt</directory>
+            </resource>
+          </webResources>
         </configuration>
       </plugin>
     </plugins>
